@@ -1,0 +1,10 @@
+click
+opencv-contrib-python
+numpy
+tqdm
+PyYAML
+progressbar2
+gdown
+
+# U-2 Net dependencies
+scikit-image
