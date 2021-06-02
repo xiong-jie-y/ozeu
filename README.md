@@ -16,6 +16,7 @@ pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio==0.8.1 -f htt
 
 pip install mmcv-full==1.3.5 -f https://download.openmmlab.com/mmcv/dist/cu102/torch1.8.0/index.html
 
+git clone git@github.com:xiong-jie-y/ozeu.git
 cd ozeu
 pip install -e . 
 ```
@@ -78,11 +79,11 @@ python scripts/generate_background_augmented_dataset.py --input-dataset-path ${D
 ### 5. Merge 
 You can merge background augmented dataset and dataset.
 
-### 7. (Optional) Import dataset into cvat.
+### 6. (Optional) Import dataset into cvat.
 There is the annotation tool [CVAT](https://github.com/openvinotoolkit/cvat) that can accept coco format dataset.
 So you can import dataset into your project and fix dataset.
 
-### 6. TRAIN!
+### 7. TRAIN!
 TRAIN!!!
 
 ## Acknowledgement
