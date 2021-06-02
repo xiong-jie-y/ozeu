@@ -79,6 +79,10 @@ python scripts/generate_background_augmented_dataset.py --input-dataset-path ${D
 ### 5. Merge 
 You can merge background augmented dataset and dataset.
 
+```bash
+python scripts/merge_coco_datasets.py --input-dirs ${AUGMENTED_DATASET_FOLDER} --input-dirs ${DATASET_FOLDER} --destination-root ${MERGED_DATASET}
+```
+
 ### 6. (Optional) Import dataset into cvat.
 There is the annotation tool [CVAT](https://github.com/openvinotoolkit/cvat) that can accept coco format dataset.
 So you can import dataset into your project and fix dataset.
