@@ -87,3 +87,4 @@ TRAIN!!!
 
 ## Acknowledgement
 * I wish to thank my wife, Remilia Scarlet.
+* This toolkit uses [U^2 net](https://github.com/xuebinqin/U-2-Net) for salient object detection. Thank you for nice model!
