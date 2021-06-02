@@ -1,5 +1,5 @@
 # Ozeu
-Ozeu is the toolkit to generate labaled dataset for instance segmentation.
+Ozeu is the toolkit to autolabal dataset for instance segmentation.
 You can generate datasets labaled with segmentation mask and bounding box from the recorded video files.
 
 ![](./imgs/dataset_screenshot.png)
