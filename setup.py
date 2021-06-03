@@ -16,7 +16,7 @@ from setuptools.command.install import install
 from subprocess import getoutput
 
 class PostInstall(install):
-    pkgs = ' git+https://github.com/open-mmlab/mmdetection.git#v2.13.0'
+    pkgs = ' git+https://github.com/open-mmlab/mmdetection.git@v2.13.0'
     def run(self):
         install.run(self)
         print(getoutput('pip install'+self.pkgs))
@@ -27,5 +27,8 @@ setuptools.setup(
     version=__version__,
     packages=setuptools.find_packages(),
     install_requires=requirements,
-    cmdclass={'install': PostInstall}
+    cmdclass={'install': PostInstall},
+    dependency_links=[
+        'https://github.com/open-mmlab/mmdetection.git',
+    ],
 )

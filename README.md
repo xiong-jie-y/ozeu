@@ -16,9 +16,11 @@ pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio==0.8.1 -f htt
 
 pip install mmcv-full==1.3.5 -f https://download.openmmlab.com/mmcv/dist/cu102/torch1.8.0/index.html
 
+pip install git+https://github.com/open-mmlab/mmdetection.git@v2.13.0
+
 git clone git@github.com:xiong-jie-y/ozeu.git
 cd ozeu
-pip install -e . 
+pip install -e .
 ```
 
 ## Usage
