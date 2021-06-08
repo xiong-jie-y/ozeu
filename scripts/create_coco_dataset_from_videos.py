@@ -56,11 +56,16 @@ def main(model_name, dataset_definition_file, hand_class_ids, output_path, fps, 
     for dataset in datasets:
         with tempfile.TemporaryDirectory() as image_path:
             video_path = dataset['video_path']
-            file_template = os.path.join(image_path, "$filename%06d.png")
-            command = f"ffmpeg -i {join(dataset_definition_file_dir, video_path)} -r {fps}/1 {file_template}"
-            subprocess.run(command, shell=True, check=True)
+            process_video = os.path.isfile(video_path)
+            if process_video:
+                file_template = os.path.join(image_path, "$filename%06d.png")
+                command = f"ffmpeg -i {join(dataset_definition_file_dir, video_path)} -r {fps}/1 {file_template}"
+                subprocess.run(command, shell=True, check=True)
+            else:
+                image_path = os.path.join(dataset_definition_file_dir, video_path)
 
             image_paths = sorted(list(glob.glob(join(image_path, "*.png"))) + list(glob.glob(join(image_path, "*.jpg"))))
+            print(f"Processing {image_path}")
             areas = []
             masks = []
             annotations = []
@@ -70,6 +75,11 @@ def main(model_name, dataset_definition_file, hand_class_ids, output_path, fps, 
             AREA_THREASHOLD = 10000
             for image_path in tqdm.tqdm(image_paths):
                 image_bgr = cv2.imread(image_path)
+                if image_bgr is None:
+                    print(f"Error {image_path}")
+                    continue
+
+                AREA_THREASHOLD = image_bgr.shape[1] * image_bgr.shape[0] * 0.1
                 image_bgr = cv2.resize(image_bgr, (image_bgr.shape[1] // resize_factor, image_bgr.shape[0] // resize_factor))
                 mask = u2_mask_model.predict_mask(image_bgr)
                 image_bgr_for_display = image_bgr.copy()
@@ -150,25 +160,28 @@ def main(model_name, dataset_definition_file, hand_class_ids, output_path, fps, 
             assert len(annotations) == len(image_data)
             assert len(annotations) == len(masks)
 
-            WINDOW_LENGTH = 5
-            ALLOWABLE_MEDIAN_DEVIATION = 0.40
-            # area_moving_median = np.convolve(areas, np.ones(WINDOW_LENGTH), 'valid') / WINDOW_LENGTH
-            # area_moving_median = scipy.signal.medfilt(areas, WINDOW_LENGTH)
-            effective_window = deque([])
-            # st.write(area_moving_median)
             near_median_indices = []
-            for i, area in enumerate(areas):
-                area_moving_median = None
-                if len(effective_window) > 0:
-                    area_moving_median = np.median(effective_window)
-                    # area_moving_median = np.mean(effective_window)
+            if process_video:
+                WINDOW_LENGTH = 5
+                ALLOWABLE_MEDIAN_DEVIATION = 0.40
+                # area_moving_median = np.convolve(areas, np.ones(WINDOW_LENGTH), 'valid') / WINDOW_LENGTH
+                # area_moving_median = scipy.signal.medfilt(areas, WINDOW_LENGTH)
+                effective_window = deque([])
+                # st.write(area_moving_median)
+                for i, area in enumerate(areas):
+                    area_moving_median = None
+                    if len(effective_window) > 0:
+                        area_moving_median = np.median(effective_window)
+                        # area_moving_median = np.mean(effective_window)
 
-                if area_moving_median is None or (area_moving_median * (1-ALLOWABLE_MEDIAN_DEVIATION) < area and area < area_moving_median * (1+ALLOWABLE_MEDIAN_DEVIATION)):
-                    if len(effective_window) == WINDOW_LENGTH:
-                        effective_window.popleft()
-                    effective_window.append(areas[i])
+                    if area_moving_median is None or (area_moving_median * (1-ALLOWABLE_MEDIAN_DEVIATION) < area and area < area_moving_median * (1+ALLOWABLE_MEDIAN_DEVIATION)):
+                        if len(effective_window) == WINDOW_LENGTH:
+                            effective_window.popleft()
+                        effective_window.append(areas[i])
 
-                    near_median_indices.append(i)
+                        near_median_indices.append(i)
+            else:
+                near_median_indices = list(range(0, len(areas)))
 
             # import IPython; IPython.embed()
 
