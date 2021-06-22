@@ -190,7 +190,7 @@ def main(model_name, dataset_definition_file, hand_class_ids, output_path, fps, 
             # ax.plot(list(range(0, len(areas))), areas)
             # st.pyplot(fig)
 
-            import IPython; IPython.embed()
+            # import IPython; IPython.embed()
 
             NUM_VAL_PER_NUM = 5
             num_added = 0
