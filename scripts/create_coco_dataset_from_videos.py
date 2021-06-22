@@ -56,13 +56,14 @@ def main(model_name, dataset_definition_file, hand_class_ids, output_path, fps, 
     for dataset in datasets:
         with tempfile.TemporaryDirectory() as image_path:
             video_path = dataset['video_path']
-            process_video = os.path.isfile(video_path)
+            file_path = join(dataset_definition_file_dir, video_path)
+            process_video = os.path.isfile(file_path)
             if process_video:
                 file_template = os.path.join(image_path, "$filename%06d.png")
-                command = f"ffmpeg -i {join(dataset_definition_file_dir, video_path)} -r {fps}/1 {file_template}"
+                command = f"ffmpeg -i {file_path} -r {fps}/1 {file_template}"
                 subprocess.run(command, shell=True, check=True)
             else:
-                image_path = os.path.join(dataset_definition_file_dir, video_path)
+                image_path = file_path
 
             image_paths = sorted(list(glob.glob(join(image_path, "*.png"))) + list(glob.glob(join(image_path, "*.jpg"))))
             print(f"Processing {image_path}")
@@ -79,8 +80,8 @@ def main(model_name, dataset_definition_file, hand_class_ids, output_path, fps, 
                     print(f"Error {image_path}")
                     continue
 
-                AREA_THREASHOLD = image_bgr.shape[1] * image_bgr.shape[0] * 0.1
                 image_bgr = cv2.resize(image_bgr, (image_bgr.shape[1] // resize_factor, image_bgr.shape[0] // resize_factor))
+                AREA_THREASHOLD = image_bgr.shape[1] * image_bgr.shape[0] * 0.1
                 mask = u2_mask_model.predict_mask(image_bgr)
                 image_bgr_for_display = image_bgr.copy()
                 mask_numpy = mask.squeeze(0).cpu().detach().numpy()
@@ -189,7 +190,7 @@ def main(model_name, dataset_definition_file, hand_class_ids, output_path, fps, 
             # ax.plot(list(range(0, len(areas))), areas)
             # st.pyplot(fig)
 
-            # import IPython; IPython.embed()
+            import IPython; IPython.embed()
 
             NUM_VAL_PER_NUM = 5
             num_added = 0
