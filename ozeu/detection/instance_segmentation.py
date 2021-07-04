@@ -1,3 +1,4 @@
+from ozeu.types.image import MaskImage, MaskType
 from typing import List
 from pkg_resources import resource_filename
 from ozeu.utils.file import get_model_file, get_model_file_from_gdrive
@@ -15,7 +16,7 @@ class InstanceSegmenter:
         self.model = init_detector(config_file, checkpoint_file, device=device)
         self.previous_seg = None
 
-    def get_mask(self, color_image_bgr: np.ndarray, class_names: List[str]):
+    def get_mask(self, color_image_bgr: np.ndarray, class_names: List[str], confidence_threshold: float=0.0) -> MaskImage:
         result = inference_detector(self.model, color_image_bgr)
 
         detection_image = self.model.show_result(
@@ -39,7 +40,7 @@ class InstanceSegmenter:
         not_found = True
         for seg_list, label_list, detection_list in zip(segmentations, labels, result[0]):
             for seg, label, detection in zip(seg_list, label_list, detection_list):
-                if detection[4] > 0.5 and label in class_indices:
+                if detection[4] > confidence_threshold and label in class_indices:
                     mask[seg == 1] = 0
                     self.previous_seg = seg
                     not_found = False
@@ -47,4 +48,4 @@ class InstanceSegmenter:
         # if not_found:
         #     mask[self.previous_seg == 1] = 0
 
-        return mask
+        return MaskImage(mask, MaskType.PositiveBlack)
